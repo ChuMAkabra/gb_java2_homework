@@ -1,7 +1,8 @@
 package Assignment_01;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
 /** 3.	Задача:
  a.	Даны классы Fruit, Apple extends Fruit, Orange extends Fruit;
@@ -14,19 +15,26 @@ import java.util.Collections;
  **/
 
 public class Box<T extends Fruit> {
-    private final ArrayList<T> fruitBox = new ArrayList<>();
+
+    private List<T> container;
     private float weight;
+
+    public Box() {
+        this.container = new ArrayList<>();
+        weight = 0;
+    }
 
     @SafeVarargs
     public Box(T... fruits) {
-        Collections.addAll(fruitBox, fruits);
+        // добавить все объекты Т в коллекцию [можно и так: Collections.addAll(container, fruits);]
+        this.container = new ArrayList<>(Arrays.asList(fruits));
         calculateWeight();
     }
 
     // вопреки заданию сделал метод getWeight простым геттером, а calculateWeight методом подсчета
     public void calculateWeight() {
-        if (fruitBox.size() > 0) {
-            weight = fruitBox.size() * fruitBox.get(0).getWeight();
+        if (container.size() > 0) {
+            weight = container.size() * container.get(0).getWeight();
         }
         else weight = 0;
     }
@@ -35,24 +43,27 @@ public class Box<T extends Fruit> {
         return weight;
     }
 
-    public boolean compare(Box<?> fruitBox) {
-        return (Math.abs(this.getWeight() - fruitBox.getWeight()) < 0.0001);
+    public boolean compare(Box<?> anotherBox) {
+        // 0.00000001f - не стоит указывать f, ибо double по дефолту число будет обрезано до 0
+        return (Math.abs(this.getWeight() - anotherBox.getWeight()) < 0.00000001);
     }
 
-    public void transfer(Box<T> fruitBox) {
-        while (this.fruitBox.size() > 0) {
-            fruitBox.add(this.fruitBox.remove(0));
-        }
+    public void transfer(Box<T> anotherBox) {
+        // при попытке пересыпать коробки в саму себя, ничего не делать
+        if (anotherBox == this) return;
+
+        anotherBox.container.addAll(this.container);
+        this.container.clear();
         weight = 0;
     }
 
     private void add(T obj) {
-        fruitBox.add(obj);
+        container.add(obj);
         calculateWeight();
     }
 
     @Override
     public String toString() {
-        return "Box. Count: " + fruitBox.size() + ". Weight: " + getWeight() + " kilos";
+        return "Box. Count: " + container.size() + ". Weight: " + getWeight() + " kilos";
     }
 }

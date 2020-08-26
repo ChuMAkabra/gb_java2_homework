@@ -17,16 +17,22 @@ public class Main {
         Box<Apple> boxApple =   new Box<>(new Apple(), new Apple(), new Apple());
         Box<Orange> boxOrange = new Box<>(new Orange(), new Orange());
 
+        // сравнение двух контейнеров
         System.out.printf("Apples: %fkg\nOranges: %fkg\n", boxApple.getWeight(), boxOrange.getWeight());
         System.out.println(boxApple.compare(boxOrange));
 
+        // попытка перекинуть фрукты из контейнера в другой
         System.out.println();
         Box<Apple> boxApple1 =  new Box<>(new Apple());
         boxApple.transfer(boxApple1);
         System.out.println(boxApple);
         System.out.println(boxApple1);
 
-
+        // попытка перекинуть фрукты из контейнера в себя же
+        System.out.println();
+        System.out.println(boxApple1);
+        boxApple1.transfer(boxApple1);
+        System.out.println(boxApple1);
     }
 
     /** 1.	Написать метод, который меняет два элемента массива местами
@@ -42,8 +48,7 @@ public class Main {
 
     /** 2.	Написать метод, который преобразует массив в ArrayList **/
     public static <T> ArrayList<T> arrayToList(T[] arr){
-        ArrayList<T> al = new ArrayList<>(Arrays.asList(arr));
-        return al;
+        return new ArrayList<>(Arrays.asList(arr));
     }
 
     private static void outputArray(String[] strArr) {

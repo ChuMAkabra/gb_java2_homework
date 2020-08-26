@@ -1,10 +1,12 @@
 package Assignment_01;
 
 public abstract class Fruit {
-    private static float WEIGHT;
-    private static final String NAME = "fruit";
+    private float weight;
 
-    public abstract float getWeight();
-
-    public abstract String getName();
+    public Fruit(float weight) {
+        this.weight = weight;
+    }
+    public float getWeight() {
+        return weight;
+    }
 }
