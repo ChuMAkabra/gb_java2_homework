@@ -151,6 +151,10 @@ public class Controller implements Initializable {
                                     }
                                 });
                             }
+                            if (str.startsWith("/newnick ")) {
+                                String[] token = str.split("\\s");
+                                setTitle(token[1]);
+                            }
 
                         } else {
                             textArea.appendText(str + "\n");

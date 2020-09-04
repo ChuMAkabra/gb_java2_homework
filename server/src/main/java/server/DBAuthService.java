@@ -6,8 +6,6 @@ import java.sql.*;
 
 public class DBAuthService implements AuthService {
     private static Connection connection;
-    private static Statement statement;
-    private static PreparedStatement preparedStatement;
     private static ResultSet rs;
 
     public DBAuthService() {
@@ -17,8 +15,6 @@ public class DBAuthService implements AuthService {
         } catch (Exception e) {
             e.printStackTrace();
             disconnect();
-//        } finally {
-//
         }
 
     }
@@ -32,11 +28,10 @@ public class DBAuthService implements AuthService {
 
         try {
             connection = DriverManager.getConnection(JDBC.PREFIX + "main.db"); //jdbc.sqlite:main.db
-            statement = connection.createStatement();
+            Statement statement = connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-//        statement.executeUpdate("INSERT INTO students (name, score) VALUES ('guy2', '70')");
     }
 
     private void disconnect() {
@@ -65,26 +60,48 @@ public class DBAuthService implements AuthService {
     @Override
     public boolean registration(String login, String password, String nickname){
         try {
+            PreparedStatement psRegistration;
             if (recordFound(login, password))
                 return false;
             else
-                preparedStatement = connection.prepareStatement("INSERT INTO users (login, password, nick) VALUES (?, ?, ?)");
-                preparedStatement.setString(1, login);
-                preparedStatement.setString(2, password);
-                preparedStatement.setString(3, nickname);
-                preparedStatement.executeUpdate();
+                psRegistration = connection.prepareStatement("INSERT INTO users (login, password, nick) VALUES (?, ?, ?)");
+                psRegistration.setString(1, login);
+                psRegistration.setString(2, password);
+                psRegistration.setString(3, nickname);
+                psRegistration.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            disconnect();
         }
         return true;
     }
 
     private boolean recordFound(String login, String password) throws SQLException {
         connect();
-        preparedStatement = connection.prepareStatement("SELECT nick FROM users WHERE login = ? AND password = ?");
-        preparedStatement.setString(1, login);
-        preparedStatement.setString(2, password);
-        rs = preparedStatement.executeQuery();
+        PreparedStatement psRecordFound = connection.prepareStatement("SELECT nick FROM users WHERE login = ? AND password = ?");
+        psRecordFound.setString(1, login);
+        psRecordFound.setString(2, password);
+        rs = psRecordFound.executeQuery();
         return rs.next();
+    }
+
+    @Override
+    public boolean changeNickname(String oldNickname, String newNickname) {
+        connect();
+        try {
+            PreparedStatement psChangeNickname = connection.prepareStatement("UPDATE users SET nick = ? where nick = ?");
+            psChangeNickname.setString(1, newNickname);
+            psChangeNickname.setString(2, oldNickname);
+            psChangeNickname.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            disconnect();
+        }
+
+        return false;
     }
 }
