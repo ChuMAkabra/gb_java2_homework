@@ -3,3 +3,5 @@
 dzChumanov03_01.iml
 *.iml
 .gradle/
+/target
+*/target
