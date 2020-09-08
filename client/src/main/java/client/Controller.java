@@ -1,6 +1,5 @@
 package client;
 
-
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -53,6 +52,7 @@ public class Controller implements Initializable {
 
     private boolean authenticated;
     private String nick;
+    private String login;
 
     private Stage stage;
     private Stage regStage;
@@ -97,7 +97,6 @@ public class Controller implements Initializable {
         regStage = createRegWindow();
     }
 
-
     private void connect() {
         try {
             socket = new Socket(IP_ADDRESS, PORT);
@@ -113,6 +112,8 @@ public class Controller implements Initializable {
                         if (str.startsWith("/authok ")) {
                             nick = str.split("\\s")[1];
                             setAuthenticated(true);
+                            textArea.appendText(History.getLast100HistoryLines(login));
+                            History.start(login);
                             break;
                         }
 
@@ -128,7 +129,6 @@ public class Controller implements Initializable {
                                 regController.addMessage("Регистрация не получилась, возможно логин или никнейм заняты");
                             }
                         }
-
                         textArea.appendText(str + "\n");
                     }
 
@@ -158,6 +158,7 @@ public class Controller implements Initializable {
 
                         } else {
                             textArea.appendText(str + "\n");
+                            History.writeLine(str + "\n");
                         }
                     }
                 }catch (RuntimeException e)   {
@@ -168,6 +169,7 @@ public class Controller implements Initializable {
                     try {
                         in.close();
                         out.close();
+                        History.stop();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -203,6 +205,8 @@ public class Controller implements Initializable {
         try {
             out.writeUTF(String.format("/auth %s %s", loginField.getText().trim(), passwordField.getText().trim()));
             passwordField.clear();
+            // remember login
+            login = loginField.getText().trim();
         } catch (IOException e) {
             e.printStackTrace();
         }

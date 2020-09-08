@@ -1,0 +1,8 @@
+newNick2 : hi guys!!! 
+[nick1] private [newNick2] : hi bro
+nick1 : chat works great!
+newNick1 : yep, it's awesome
+[newNick2] private [nick1] : newNick1 doesn't know anything about true chats... 
+newNick2 : bye!
+newNick1 : c ya
+nick1 : bb

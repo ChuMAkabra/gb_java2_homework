@@ -1,0 +1,14 @@
+newNick1 : hi!
+newNick1 : hi again!
+newNick1 : hooray!
+newNick1 : once again!
+newNick1 : ураааа!
+newNick1 : какая красота!
+newNick2 : hi guys!!! 
+[newNick1] private [nick1] : what's wrong with hiim? 
+[nick1] private [newNick1] : he's stupid, never mind
+nick1 : chat works great!
+newNick1 : yep, it's awesome
+newNick2 : bye!
+newNick1 : c ya
+nick1 : bb
