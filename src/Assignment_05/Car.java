@@ -1,23 +1,20 @@
 package Assignment_05;
 
 import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Car implements Runnable {
     private static int CARS_COUNT;
-    private static final CyclicBarrier startBarrier = new CyclicBarrier(MainClass.CARS_COUNT,
-            () -> System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!"));
-    private static final Lock lock = new ReentrantLock(true);
-    private final static CyclicBarrier finishBarrier = new CyclicBarrier(MainClass.CARS_COUNT);
-
     static {
         CARS_COUNT = 0;
     }
     private Race race;
     private int speed;
     private String name;
+
+    // позволит только одному гонщику сообщить о победе
+    private static final Lock lock = new ReentrantLock(true);
 
     public String getName() {
         return name;
@@ -37,7 +34,7 @@ public class Car implements Runnable {
             System.out.println(this.name + " готовится");
             Thread.sleep(500 + (int)(Math.random() * 800));
             System.out.println(this.name + " готов");
-            startBarrier.await();
+            MainClass.lineBarrier.await(); // подождать остальных на линии старта
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -47,19 +44,24 @@ public class Car implements Runnable {
         if (lock.tryLock()) {
             try {
                 System.out.println(name + " ПОБЕДИЛ!!!");
-                finishBarrier.await();
+                // барьер №2: финишная линия. Как только доберутся до финиша, появится сообщение
+                MainClass.setLineBarrier("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка закончилась!!!");
+                MainClass.lineBarrier.reset(); // сбросить счетчик барьера
+                MainClass.lineBarrier.await(); // подождать остальных на финише
             } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }
+            // отпустить лок, когда никто уже не захочет его захватить
             lock.unlock();
         }
         else {
             try {
-                finishBarrier.await();
+                MainClass.lineBarrier.await(); // подождать остальных на финише
             } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }
         }
-        MainClass.countDown.countDown();
+        // инкремировать счетчик, чтобы еще раз сообщить о завершении гонки
+        MainClass.finishCountDown.countDown();
     }
 }
