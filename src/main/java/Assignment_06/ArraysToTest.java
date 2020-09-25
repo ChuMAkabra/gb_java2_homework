@@ -2,20 +2,20 @@ package Assignment_06;
 
 import java.util.Arrays;
 
-public class ForTests {
-    public static void main(String[] args) {
-        int[] resArr1 = numbersAfterLastFour(new int[]{1, 2, 3, 4, 5, 6});
-        System.out.println(Arrays.toString(resArr1));
-        int[] resArr2 = numbersAfterLastFour(new int[]{1, 2, 3, 7, 5, 6});
-        System.out.println(Arrays.toString(resArr2));
+public class ArraysToTest {
+//    public static void main(String[] args) {
+//        int[] resArr1 = numbersAfterLastFour(new int[]{1, 2, 3, 4, 5, 6});
+//        System.out.println(Arrays.toString(resArr1));
+//        int[] resArr2 = numbersAfterLastFour(new int[]{1, 2, 3, 7, 5, 6});
+//        System.out.println(Arrays.toString(resArr2));
+//
+//        System.out.println(hasOnesAndFours(new int[] {1,1,1,4}));
+//        System.out.println(hasOnesAndFours(new int[] {1,1,1,1}));
+//        System.out.println(hasOnesAndFours(new int[] {1,1,4,3}));
+//        System.out.println(hasOnesAndFours(new int[] {4,4,4,4}));
+//    }
 
-        System.out.println(hasOnesAndFours(new int[] {1,1,1,4}));
-        System.out.println(hasOnesAndFours(new int[] {1,1,1,1}));
-        System.out.println(hasOnesAndFours(new int[] {1,1,4,3}));
-        System.out.println(hasOnesAndFours(new int[] {4,4,4,4}));
-    }
-
-    public static int[] numbersAfterLastFour(int[] arr) {
+    public int[] numbersAfterLastFour(int[] arr) {
         int arrLen = arr.length;
 
 //        try {
@@ -31,7 +31,7 @@ public class ForTests {
 //        return null;
     }
 
-    public static boolean hasOnesAndFours(int[] arr) {
+    public boolean hasOnesAndFours(int[] arr) {
         boolean has1 = false;
         boolean has4 = false;
 
