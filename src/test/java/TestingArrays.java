@@ -4,7 +4,7 @@ import org.junit.*;
 
 public class TestingArrays {
         private ArraysToTest arraysToTest;
-
+//TODO добавить параметризированные вызовы тестов!
     @Before
     public void init() {
         arraysToTest = new ArraysToTest();

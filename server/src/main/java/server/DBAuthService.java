@@ -3,15 +3,23 @@ package server;
 import org.sqlite.JDBC;
 
 import java.sql.*;
+import java.util.logging.*;
+
 
 public class DBAuthService implements AuthService {
     private static Connection connection;
     private static ResultSet rs;
+    private static final Logger logger = Logger.getLogger(DBAuthService.class.getName());
+    private static final Handler handler = new ConsoleHandler();
 
     public DBAuthService() {
         try {
             connect();
-            System.out.println("Подключились к базе!");
+            logger.setLevel(Level.ALL);
+            handler.setLevel(Level.INFO);
+            logger.addHandler(handler);
+            logger.info("Подключились к базе!");
+
         } catch (Exception e) {
             e.printStackTrace();
             disconnect();
@@ -28,7 +36,7 @@ public class DBAuthService implements AuthService {
 
         try {
             connection = DriverManager.getConnection(JDBC.PREFIX + "main.db"); //jdbc.sqlite:main.db
-            Statement statement = connection.createStatement();
+//            Statement statement = connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -58,17 +66,18 @@ public class DBAuthService implements AuthService {
     }
 
     @Override
-    public boolean registration(String login, String password, String nickname){
+    public boolean registration(String login, String password, String nickname) {
         try {
             PreparedStatement psRegistration;
             if (recordFound(login, password))
                 return false;
             else
-                psRegistration = connection.prepareStatement("INSERT INTO users (login, password, nick) VALUES (?, ?, ?)");
-                psRegistration.setString(1, login);
-                psRegistration.setString(2, password);
-                psRegistration.setString(3, nickname);
-                psRegistration.executeUpdate();
+                psRegistration = connection.prepareStatement(
+                        "INSERT INTO users (login, password, nick) VALUES (?, ?, ?)");
+            psRegistration.setString(1, login);
+            psRegistration.setString(2, password);
+            psRegistration.setString(3, nickname);
+            psRegistration.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -79,7 +88,8 @@ public class DBAuthService implements AuthService {
 
     private boolean recordFound(String login, String password) throws SQLException {
         connect();
-        PreparedStatement psRecordFound = connection.prepareStatement("SELECT nick FROM users WHERE login = ? AND password = ?");
+        PreparedStatement psRecordFound = connection.prepareStatement(
+                "SELECT nick FROM users WHERE login = ? AND password = ?");
         psRecordFound.setString(1, login);
         psRecordFound.setString(2, password);
         rs = psRecordFound.executeQuery();
@@ -90,7 +100,8 @@ public class DBAuthService implements AuthService {
     public boolean changeNickname(String oldNickname, String newNickname) {
         connect();
         try {
-            PreparedStatement psChangeNickname = connection.prepareStatement("UPDATE users SET nick = ? where nick = ?");
+            PreparedStatement psChangeNickname = connection.prepareStatement(
+                    "UPDATE users SET nick = ? where nick = ?");
             psChangeNickname.setString(1, newNickname);
             psChangeNickname.setString(2, oldNickname);
             psChangeNickname.executeUpdate();
