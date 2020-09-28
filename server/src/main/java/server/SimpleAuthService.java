@@ -40,7 +40,7 @@ public class SimpleAuthService implements AuthService {
     @Override
     public boolean registration(String login, String password, String nickname) {
         for (UserData user : users) {
-            if(user.login.equals(login) || user.nickname.equals(nickname)){
+            if (user.login.equals(login) || user.nickname.equals(nickname)) {
                 return false;
             }
         }

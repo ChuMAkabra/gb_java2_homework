@@ -71,7 +71,7 @@ public class Server {
         String message = String.format("[%s] private [%s] : %s", sender.getNick(), receiver, msg);
 
         for (ClientHandler c : clients) {
-            if(c.getNick().equals(receiver)){
+            if (c.getNick().equals(receiver)) {
                 c.sendMsg(message);
                 sender.sendMsg(message);
                 return;
@@ -91,9 +91,9 @@ public class Server {
         broadcastClientList();
     }
 
-    public boolean isLoginAuthorized(String login){
+    public boolean isLoginAuthorized(String login) {
         for (ClientHandler c : clients) {
-            if(c.getLogin().equals(login)){
+            if (c.getLogin().equals(login)) {
                 return true;
             }
         }
