@@ -5,16 +5,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.*;
 
 public class Server {
     private List<ClientHandler> clients;
     private AuthService authService;
+    private static final Logger logger = Logger.getLogger(Server.class.getName());
+    private static final Handler handler = new ConsoleHandler();
 
     public AuthService getAuthService() {
         return authService;
     }
 
     public Server() {
+        handler.setLevel(Level.CONFIG);
+        logger.addHandler(handler);
+
         clients = new Vector<>();
         authService = new DBAuthService(); // replaces SimpleAuthService();
 
@@ -23,24 +29,32 @@ public class Server {
 
         final int PORT = 8189;
 
+
         try {
             server = new ServerSocket(PORT);
-            System.out.println("Сервер запущен!");
+            logger.config("Сервер запущен!");
+            logger.fine("Тестовое сообщение, не попадающее никуда");
+            logger.severe("Тестовое сообщение для записи в файл");
 
             while (true) {
                 socket = server.accept();
-                System.out.println("Клиент подключился");
-                System.out.println("socket.getRemoteSocketAddress(): " + socket.getRemoteSocketAddress());
-                System.out.println("socket.getLocalSocketAddress() " + socket.getLocalSocketAddress());
+                // записываем в лог двумя разными методами
+                logger.log(Level.CONFIG, "Local Socket Address: " +
+                        socket.getLocalSocketAddress());
+                logger.config("Remote Socket Address: " +
+                        socket.getRemoteSocketAddress());
                 new ClientHandler(this, socket);
             }
         } catch (IOException e) {
             e.printStackTrace();
+            // передаем объект Throwable в лог
+            logger.log(Level.SEVERE, "Ошибка подключения", e);
         } finally {
             try {
                 server.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                logger.log(Level.SEVERE, "Ошибка при закрытии соединения", e);
             }
         }
     }
@@ -57,7 +71,7 @@ public class Server {
         String message = String.format("[%s] private [%s] : %s", sender.getNick(), receiver, msg);
 
         for (ClientHandler c : clients) {
-            if(c.getNick().equals(receiver)){
+            if (c.getNick().equals(receiver)) {
                 c.sendMsg(message);
                 sender.sendMsg(message);
                 return;
@@ -77,9 +91,9 @@ public class Server {
         broadcastClientList();
     }
 
-    public boolean isLoginAuthorized(String login){
+    public boolean isLoginAuthorized(String login) {
         for (ClientHandler c : clients) {
-            if(c.getLogin().equals(login)){
+            if (c.getLogin().equals(login)) {
                 return true;
             }
         }

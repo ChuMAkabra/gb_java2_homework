@@ -5,8 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClientHandler {
+    private static final Logger logger = Logger.getLogger(ClientHandler.class.getName());
+    private static final Handler handler = new ConsoleHandler();
+
     Server server;
     Socket socket = null;
     DataInputStream in;
@@ -17,10 +24,13 @@ public class ClientHandler {
 
     public ClientHandler(Server server, Socket socket) {
         try {
+            handler.setLevel(Level.INFO);
+            logger.addHandler(handler);
             this.server = server;
             this.socket = socket;
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+
 
             new Thread(() -> {
                 try {
@@ -44,14 +54,16 @@ public class ClientHandler {
                                     sendMsg("/authok " + newNick);
                                     nick = newNick;
                                     server.subscribe(this);
-                                    System.out.printf("Клиент %s подключился \n", nick);
+                                    logger.info("Клиент " + nick + " подключился");
                                     socket.setSoTimeout(0);
                                     break;
                                 } else {
                                     sendMsg("С этим логином уже авторизовались");
+                                    logger.info("С этим логином уже авторизовались");
                                 }
                             } else {
                                 sendMsg("Неверный логин / пароль");
+                                logger.info("Неверный логин / пароль");
                             }
                         }
 
@@ -61,11 +73,13 @@ public class ClientHandler {
                                 continue;
                             }
                             boolean b = server.getAuthService()
-                                    .registration(token[1],token[2],token[3]);
-                            if(b){
+                                    .registration(token[1], token[2], token[3]);
+                            if (b) {
                                 sendMsg("/regresult ok");
-                            }else{
+                                logger.info("Регистрация прошла успешно");
+                            } else {
                                 sendMsg("/regresult failed");
+                                logger.info("Ошибка при регистрации");
                             }
                         }
                     }
@@ -92,21 +106,24 @@ public class ClientHandler {
                                 String[] token = str.split("\\s", 2);
                                 if (token[1].equals("")) {
                                     sendMsg("Ник не введен");
+                                    logger.info("Ник не введен");
                                     continue;
                                 }
                                 if (token[1].contains(" ")) {
                                     sendMsg("Ник не может содержать пробелов");
+                                    logger.info("Ник не может содержать пробелов");
                                     continue;
                                 }
-                                if(server.getAuthService().changeNickname(this.nick, token[1])) {
+                                if (server.getAuthService().changeNickname(this.nick, token[1])) {
                                     sendMsg("/newnick " + token[1]);
                                     sendMsg("Ник успешно заменен на " + token[1]);
+                                    logger.info("Ник успешно заменен на " + token[1]);
                                     this.nick = token[1];
                                     server.broadcastClientList();
 
-                                }
-                                else {
-                                   sendMsg("Что-то пошло не так...");
+                                } else {
+                                    sendMsg("Что-то пошло не так...");
+                                    logger.warning("Что-то пошло не так..." + token[1]);
                                 }
                             }
 
@@ -114,12 +131,12 @@ public class ClientHandler {
                             server.broadcastMsg(this, str);
                         }
                     }
-                }catch (SocketTimeoutException e){
+                } catch (SocketTimeoutException e) {
                     sendMsg("/end");
-                }catch (IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    System.out.println("Клиент отключился");
+                    logger.info("Клиент отключился");
                     server.unsubscribe(this);
                     try {
                         in.close();
